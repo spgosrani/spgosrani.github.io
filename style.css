@@ -1,0 +1,236 @@
+/* ---------- 1. DESIGN TOKENS ----------
+   Change these values and the whole site updates. */
+:root {
+  --bg: #fffdfa;          /* warm off-white page */
+  --ink: #3b3a6e;         /* deep indigo: text, borders, button */
+  --ink-soft: #66659a;    /* secondary text */
+  --lavender: #b9aaf2;    /* the graphic */
+  --line: #e2ddf6;        /* faint dividers between sections */
+
+  --sans: "Albert Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --header-h: 4.5rem;
+  --pad: clamp(1.5rem, 6vw, 5.5rem);   /* left/right space inside the frame */
+}
+
+/* ---------- 2. BASE ---------- */
+* { box-sizing: border-box; }
+
+html { scroll-padding-top: var(--header-h); }
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+body {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+/* Outer wrapper: page margins on both sides, centered on wide screens */
+.page {
+  max-width: 96rem;
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 3vw, 3rem);
+}
+
+h1, h2, h3 { margin: 0; }
+h1 { font-size: clamp(2.25rem, 5vw, 3.75rem); font-weight: 300; line-height: 1.1; letter-spacing: -0.01em; }
+h3 { font-size: 1.15rem; font-weight: 500; line-height: 1.3; margin-bottom: 0.4rem; }
+
+p { margin: 0 0 1em; max-width: 34rem; }
+
+a { color: var(--ink); text-underline-offset: 0.2em; }
+
+:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* Section labels like [ABOUT]. The brackets are added here, so the HTML stays clean. */
+.label {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+.label::before { content: "["; }
+.label::after  { content: "]"; }
+
+/* ---------- 3. HEADER ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--ink);
+}
+
+.brand {
+  font-size: 1.4rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.site-header nav { display: flex; gap: 2rem; }
+
+.site-header nav a,
+.button {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.site-header nav a {
+  padding: 0.25rem 0;
+  border-bottom: 1px solid transparent;
+}
+
+.site-header nav a:hover,
+.site-header nav a.active {   /* .active is added by script.js */
+  border-bottom-color: var(--ink);
+}
+
+.button {
+  padding: 0.6rem 1.1rem;
+  color: var(--bg);
+  background: var(--ink);
+  border: 1px solid var(--ink);
+}
+
+.button:hover { background: var(--bg); color: var(--ink); }
+
+/* ---------- 4. THE FRAME ----------
+   Thin vertical lines down both sides of the content. */
+main {
+  border-left: 1px solid var(--ink);
+  border-right: 1px solid var(--ink);
+}
+
+main > section + section { border-top: 1px solid var(--line); }
+
+.section { padding: 5rem var(--pad); }
+
+/* ---------- 5. HERO ---------- */
+.hero {
+  min-height: calc(100vh - var(--header-h));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 3rem;
+  padding-top: 5rem;
+}
+
+.hero-text { padding: 0 var(--pad); }
+
+.lead {
+  margin: 1.5rem 0 0;
+  font-size: 1.35rem;
+  font-weight: 300;
+  color: var(--ink-soft);
+}
+
+/* ---------- 6. SPIKE TRACE ---------- */
+.trace-wrap { overflow: hidden; }
+
+.trace {
+  display: block;
+  width: 100%;
+  min-width: 40rem;   /* on phones, shows the left part instead of shrinking */
+  height: auto;
+}
+
+.trace .axis   { stroke: var(--lavender); stroke-width: 1.2; }
+.trace .signal { fill: none; stroke: var(--lavender); stroke-width: 1.8; }
+.trace .guide  { stroke: var(--ink-soft); stroke-width: 1; stroke-dasharray: 4 4; }
+.trace .dot    { fill: var(--lavender); }
+.trace text    { font-family: var(--mono); font-size: 13px; fill: var(--ink-soft); }
+
+/* The line draws itself once on page load (skipped if the visitor prefers less motion) */
+@media (prefers-reduced-motion: no-preference) {
+  .trace .signal {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 3.5s ease-in-out 0.3s forwards;
+  }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+}
+
+/* ---------- 7. HIGHLIGHTS ---------- */
+.highlights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 2.5rem;
+}
+
+.highlight { border-top: 1px solid var(--ink); padding-top: 1rem; }
+.highlight p { margin: 0; color: var(--ink-soft); }
+
+/* ---------- 8. TIMELINE ---------- */
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 1.75rem;
+  border-left: 1px solid var(--lavender);
+}
+
+.timeline li { position: relative; padding-bottom: 2.25rem; }
+.timeline li:last-child { padding-bottom: 0; }
+
+.timeline li::before {      /* the dot on the line */
+  content: "";
+  position: absolute;
+  left: calc(-1.75rem - 5px);
+  top: 0.35rem;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.when {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.timeline p { margin: 0; color: var(--ink-soft); }
+
+/* ---------- 9. FOOTER ---------- */
+.site-footer {
+  padding: 2rem 0;
+  border-top: 1px solid var(--ink);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+.site-footer p { margin: 0; max-width: none; }
+
+/* ---------- 10. SMALL SCREENS ---------- */
+@media (max-width: 48rem) {
+  .brand, .button { display: none; }   /* leaves room for the nav links */
+  .site-header { justify-content: center; }
+  .site-header nav { gap: 1rem; }
+  .site-header nav a { font-size: 0.7rem; letter-spacing: 0.04em; }
+  .section { padding: 3.5rem var(--pad); }
+  .hero { padding-top: 3rem; }
+  .trace text { display: none; }
+}
