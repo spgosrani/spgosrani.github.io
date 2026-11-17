@@ -1,0 +1,225 @@
+/* ---------- 1. DESIGN TOKENS ----------
+   Change these values and the whole site updates. */
+:root {
+  --bg: #f2f6f4;          /* page background: a cool, faintly green white */
+  --ink: #14302b;         /* main text: deep green */
+  --ink-soft: #4d6560;    /* secondary text */
+  --teal: #14968a;        /* peaks, the line, filled dots */
+  --teal-text: #0b6f66;   /* teal dark enough to read as text */
+  --line: #d3dfdb;        /* faint lines and empty dots */
+  --line-strong: #9fb8b1;
+
+  --display: "Bricolage Grotesque", system-ui, sans-serif;
+  --sans: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --header-h: 4rem;
+  --indent: clamp(2.25rem, 7vw, 4.5rem);   /* space between the line and the content */
+}
+
+/* ---------- 2. BASE ---------- */
+* { box-sizing: border-box; }
+
+html { scroll-padding-top: calc(var(--header-h) + 1rem); }
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+body {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 1.125rem;
+  line-height: 1.65;
+  color: var(--ink);
+  background: var(--bg);
+  overflow-x: clip;   /* stops the full-width trace from causing sideways scrolling */
+}
+
+.page {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+}
+
+h1, h2, h3 { font-family: var(--display); margin: 0; }
+h1 { font-size: clamp(2.75rem, 8vw, 5.5rem); font-weight: 700; line-height: 1; letter-spacing: -0.03em; }
+h2 { font-size: 1.75rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; margin-bottom: 1.25rem; }
+h3 { font-size: 1.2rem; font-weight: 600; line-height: 1.3; margin-bottom: 0.35rem; }
+
+p { margin: 0 0 1em; max-width: 36rem; }
+
+a { color: var(--teal-text); text-underline-offset: 0.2em; }
+
+:focus-visible { outline: 3px solid var(--teal-text); outline-offset: 3px; }
+
+/* ---------- 3. HEADER ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  font-family: var(--display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.site-header nav { display: flex; gap: 1.75rem; }
+
+.site-header nav a {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+  text-decoration: none;
+  padding: 0.25rem 0;
+  border-bottom: 2px solid transparent;
+}
+
+.site-header nav a:hover,
+.site-header nav a.active {   /* .active is added by script.js */
+  color: var(--ink);
+  border-bottom-color: var(--teal);
+}
+
+/* ---------- 4. THE LINE AND ITS DOTS ----------
+   A line runs down the left side of the page. Each section, and each entry in "My path",
+   gets a dot on it. script.js fills the line and the dots as you scroll. */
+main { position: relative; }
+
+.spine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: var(--line);
+}
+
+.spine-fill {
+  width: 100%;
+  height: var(--progress, 0%);   /* set by script.js */
+  background: var(--teal);
+}
+
+main > section {
+  position: relative;
+  padding: 4.5rem 0 4.5rem var(--indent);
+}
+
+main > section::before,
+.timeline li::before {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--line-strong);
+}
+
+main > section::before {
+  left: -6px;            /* centers the dot on the line */
+  top: 5.1rem;
+  width: 14px;
+  height: 14px;
+}
+
+.reached::before,
+.timeline li.reached::before { background: var(--teal); border-color: var(--teal); }
+
+/* ---------- 5. HERO ---------- */
+.hero { padding-top: 5rem; padding-bottom: 0; }
+
+.lead {
+  margin: 1.5rem 0 0;
+  font-size: 1.4rem;
+  font-weight: 300;
+  color: var(--ink-soft);
+  max-width: 30em;
+}
+
+/* ---------- 6. PEAK TRACE ---------- */
+.trace {
+  position: relative;           /* sits in front of the vertical line, so the line passes behind it */
+  background: var(--bg);
+  width: 100vw;
+  margin: 2.5rem 0 1rem calc(50% - 50vw);   /* stretches edge to edge of the browser window */
+}
+
+.trace svg {
+  display: block;
+  width: 100%;
+  height: clamp(8rem, 18vw, 15rem);
+}
+
+.trace .base { stroke: var(--line-strong); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.trace .fill { fill: var(--teal); fill-opacity: 0.14; }
+.trace .line { fill: none; stroke: var(--teal); stroke-width: 1.6; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+
+/* The trace is revealed from left to right once on page load (skipped if the visitor prefers less motion) */
+@media (prefers-reduced-motion: no-preference) {
+  .trace svg {
+    clip-path: inset(0 100% 0 0);
+    animation: reveal 3s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards;
+  }
+  @keyframes reveal { to { clip-path: inset(0 0 0 0); } }
+}
+
+/* ---------- 7. HIGHLIGHTS ---------- */
+.highlights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 2rem 2.5rem;
+}
+
+.highlight p { margin: 0; color: var(--ink-soft); }
+
+/* ---------- 8. TIMELINE ---------- */
+.timeline { list-style: none; margin: 0; padding: 0; }
+
+.timeline li { position: relative; padding-bottom: 2.25rem; }
+.timeline li:last-child { padding-bottom: 0; }
+
+.timeline li::before {
+  left: calc(-1 * var(--indent) - 4px);   /* sits on the same line as the section dots */
+  top: 0.3rem;
+  width: 10px;
+  height: 10px;
+}
+
+.when {
+  display: block;
+  margin-bottom: 0.15rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--teal-text);
+}
+
+.timeline p { margin: 0; color: var(--ink-soft); }
+
+/* ---------- 9. FOOTER ---------- */
+.site-footer {
+  padding: 2rem 0 2.5rem var(--indent);
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+.site-footer p { margin: 0; }
+
+/* ---------- 10. SMALL SCREENS ---------- */
+@media (max-width: 40rem) {
+  .brand { display: none; }
+  .site-header { justify-content: center; }
+  .site-header nav { gap: 1.1rem; }
+  .site-header nav a { font-size: 0.85rem; }
+  main > section { padding-top: 3.5rem; padding-bottom: 3.5rem; }
+  main > section::before { top: 3.95rem; }
+  .hero { padding-top: 3rem; }
+}
